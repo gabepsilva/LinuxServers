@@ -1,0 +1,65 @@
+<VirtualHost *:<ApachePort>>
+
+	ServerAlias <ApacheServerAlias>
+	ServerAdmin <ApacheServerAdmin>
+    DocumentRoot <ApacheDocumentRoot>
+	
+	#FORCE HTTPS
+	RewriteEngine On
+	RewriteCond %{HTTP:X-Forwarded-Proto} !https
+	RewriteRule !/status https://<ApacheServerName>%{REQUEST_URI} [L,R] #Variable %{SERVER_NAME} = eguard.ga
+	
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+	
+	ErrorDocument 403 "Sorry the link you used is invalid.<br /><h2>Please visit our <a href='/'>Home Page</a></h2>"
+	
+</VirtualHost>
+
+<VirtualHost *:<ApacheHTTPSport>>
+
+	ServerAlias <ApacheServerAlias>
+	ServerAdmin <ApacheServerAdmin>
+	DocumentRoot <ApacheDocumentRoot>
+	 
+    SSLEngine on                                                                
+    SSLProtocol all -SSLv2                                                      
+    SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM                
+
+    SSLCertificateFile <certInstallPath>/<certFilename>                    
+    SSLCertificateKeyFile <certInstallPath>/<keyFilename>                
+	
+	RewriteEngine On
+	RewriteCond %{HTTP_HOST} ^.*\.<ApacheServerName>
+	RewriteRule ^/(.*)$ https://<ApacheServerName>/$1 [L,R=301]
+	
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+    </Directory>
+    <Directory <ApacheDocumentRoot>>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+    <Directory "/usr/lib/cgi-bin">
+        AllowOverride None
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+	
+	ErrorDocument 403 "Sorry the link you used is invalid.<br /><h2>Please visit our <a href='/'>Home Page</a></h2>"
+
+</VirtualHost>
