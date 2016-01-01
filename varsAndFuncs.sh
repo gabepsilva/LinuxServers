@@ -2,13 +2,17 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+
+
 #simple function to send build log
 printLog()
 {
 
-	echo "================================="
-	echo "$1"
-	echo "================================="
+	#echo "================================="
+	echo ""
+	echo -e "\e[92m$1\e[0m"
+	echo ""
+	#echo "================================="
 
 }
 
